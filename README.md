@@ -41,4 +41,14 @@ Entry module "rollup.config.js" is implicitly using "default" export mode,
 
 
 
+## blog の記事をフォルダごとにまとめる
+
+画像、コード、その他をひとまとめにすると便利
+
+markdownを ESモジュールとして読み込むときに、以下のように書けばファイルの階層関係なくすべて配列として取れる。
+
+```js
+import all from "./posts/**/*.md";
+```
+
 
