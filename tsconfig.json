@@ -1,0 +1,12 @@
+{
+  "include": ["src/**/*", "typings/@sapper/index.d.ts"],
+  "exclude": ["node_modules/*"],
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "es2015",
+    "types": ["svelte", "node", "@sapper"],
+    "typeRoots": ["typings"],
+    "allowJs": true,
+    "moduleResolution": "node"
+  }
+}
