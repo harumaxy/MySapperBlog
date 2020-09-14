@@ -51,4 +51,17 @@ markdownを ESモジュールとして読み込むときに、以下のように
 import all from "./posts/**/*.md";
 ```
 
+## markdown
+
+`mdsvex`を使う。
+これを使うと markdown が svelte コンポーネントに変換される
+(プリプロセッサ)
+
+`.svx` 拡張子を使う(`.svelte`にも書けるけど)
+
+例にもれず `rollup.config.js` の設定がだるい
+
+[JavaScript in Markdown ✅](https://sapper-goals.netlify.app/goals/javascript-in-markdown/)
+
+
 
