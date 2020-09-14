@@ -1,12 +1,16 @@
 <script context="module">
   export function preload({ params, query }) {
-    return this.fetch(`blog.json`).then(r => r.json()).then(posts => {
-      return { posts };
-    });
+    return this.fetch(`blog.json`)
+      .then((r) => r.json())
+      .then((posts) => {
+        return { posts };
+      });
   }
 </script>
 
 <script>
+  import { each } from "svelte/internal";
+
   export let posts;
 </script>
 
@@ -18,7 +22,7 @@
   }
 
   .post-item-date {
-    color: #AAA;
+    color: #aaa;
     text-align: left;
     text-transform: uppercase;
     margin-right: 16px;
@@ -40,10 +44,14 @@
       <hr />
     {/if}
     <div class="post-item">
-      <h2>
-        <a rel='prefetch' href='blog/{post.slug}'>{post.title}</a>
-      </h2>
+      <h2><a rel="prefetch" href="blog/{post.slug}">{post.title}</a></h2>
       <p>{post.excerpt}</p>
+      <div class="py-4">
+        {#each post.tags as tag}
+          <span
+            class="text-white bg-purple-300 rounded-full py-2 px-4">{tag}</span>
+        {/each}
+      </div>
       <div class="post-item-footer">
         <span class="post-item-date">— {post.printDate}</span>
       </div>
