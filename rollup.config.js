@@ -41,7 +41,13 @@ module.exports = {
         hydratable: true,
         emitCss: true,
         extensions: [".svelte", ".svx"],
-        preprocess: [mdsvex()],
+        preprocess: [
+          mdsvex({
+            layout: {
+              article: "./src/routes/_container.svelte",
+            },
+          }),
+        ],
       }),
       resolve(),
       commonjs(),
