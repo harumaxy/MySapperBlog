@@ -10,6 +10,7 @@ import markdown from "./src/utils/markdown.js";
 import pkg from "./package.json";
 import sveltePreprocess from "svelte-preprocess";
 import typescript from "@rollup/plugin-typescript";
+import { mdsvex } from "mdsvex";
 
 const mode = process.env.NODE_ENV;
 const dev = mode === "development";
@@ -20,7 +21,7 @@ const onwarn = (warning, onwarn) =>
     warning.message.includes("/@sapper/")) ||
   onwarn(warning);
 
-const preprocess = sveltePreprocess({
+const postcssProcess = sveltePreprocess({
   postcss: {
     plugins: [require("postcss-import")(), require("postcss-nested")()],
   },
@@ -39,6 +40,8 @@ module.exports = {
         dev,
         hydratable: true,
         emitCss: true,
+        extensions: [".svelte", ".svx"],
+        preprocess: [mdsvex()],
       }),
       resolve(),
       commonjs(),
@@ -87,9 +90,10 @@ module.exports = {
         "process.env.NODE_ENV": JSON.stringify(mode),
       }),
       svelte({
-        preprocess,
         generate: "ssr",
         dev,
+        extensions: [".svelte", ".svx"],
+        preprocess: [mdsvex(), postcssProcess],
       }),
       resolve(),
       commonjs(),
