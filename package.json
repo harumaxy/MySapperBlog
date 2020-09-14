@@ -1,6 +1,7 @@
 {
   "name": "TODO",
   "description": "TODO",
+  "homepage": ".",
   "version": "0.0.1",
   "scripts": {
     "dev": "run-p start:dev watch:css",
