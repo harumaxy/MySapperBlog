@@ -27,10 +27,11 @@ layout: article
 
 # about
 
-今をときめくフロントエンドスタックの新生児 `svelte` 
-のSSRフレームワーク `sapper` でテキトーに作ったブログ。
+今をときめくフロントエンドスタックの新生児 `svelte`  
+のSSRフレームワーク `sapper` でテキトーに作ったブログ。  
 
 ほぼテンプレート(超便利)
+
 https://github.com/Charca/sapper-blog-template
 
 
@@ -41,5 +42,6 @@ https://github.com/Charca/sapper-blog-template
 を導入したあたりで力尽きた。
 
 ソースはここ👇
+
 https://github.com/harumaxy/MySapperBlog
 
