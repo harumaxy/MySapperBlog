@@ -65,3 +65,12 @@ import all from "./posts/**/*.md";
 
 
 
+## Netlify で CSS の読み込みに失敗する
+
+`static/assets` フォルダを作って、そっちに移動して
+`template.html`の参照パスも更新したら直った。
+
+
+https://stackoverflow.com/questions/36545803/failed-to-load-css-file
+
+なんでかはよくわからん。
