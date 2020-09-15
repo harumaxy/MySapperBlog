@@ -1,0 +1,13 @@
+[build]
+  base = "."
+  publish = "__sapper__/export"
+  command = "yarn export"
+
+  # Directory with the serverless Lambda functions to deploy to AWS.
+  # functions = "functions/"
+
+
+# [context.production]
+#   publish = "output/"
+#   command = "make publish"
+#   environment = { ACCESS_TOKEN = "super secret", NODE_VERSION = "8.0.1" }
