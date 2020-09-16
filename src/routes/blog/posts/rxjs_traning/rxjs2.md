@@ -74,3 +74,4 @@ noop は Rxjs が用意している関数
 Observable の形になっていると、`Rxjs Operator`を使って他の`Stream`に変換したり、組み合わせたりできる。
 例えば `fetch`の結果の中に`Array`があったりしたら、それを`Stream`に変換して
 次の処理に流せる。
+
