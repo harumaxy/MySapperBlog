@@ -297,5 +297,211 @@ saveCourse(changes) = fromPromise(
 
 コレを、`Obserbable Concatnation`で実現する。
 
-# concatMap & saveObservable
+# concatMap()
 
+実装よっては FlatMap とも呼ばれる
+http://reactivex.io/documentation/operators/flatmap.html
+https://www.learnrxjs.io/learn-rxjs/operators/transformation/concatmap
+
+
+Observable によって発行された値を使ってPromiseを返す関数を map する。
+Promiseは resolve された順番で Stream に流される。
+
+
+# Merge Obaservable combination strategy
+
+Observable の統合の組み合わせ戦略
+
+Merge strategy
+
+# Merge Operator
+
+http://reactivex.io/documentation/operators/merge.html
+
+複数の Observable を一つに結合する
+
+Concat との違いは、
+- Concat -> 順番につなぐ、直列処理
+- Merge -> 2つのStreamを同時に流す、並列・並行処理
+
+```ts
+const interval1$ = interval(1000);
+const interval2$ = interval1$.pipe(map((val) => 10 * val));
+
+const result$ = merge(interval1$, interval2$);
+result$.subscribe((val) => console.log(val));
+```
+
+
+## HTTP 通信における concatMap vs mergeMap
+
+- concatMap: Promise 値を、元の Stream の順番と同じ順番になるように解決する
+- mergeMap: 並行処理で実行して、解決した時間順で stream に流れる
+  - 大体はHTTP通信を開始した時間順になるが
+
+イメージ
+```sh
+# concatMap
+---
+   ---
+      ---
+
+# meregMap
+---
+ ---
+  ---
+```
+
+順番や確実性が必要なときは concatMap
+平行性やパフォーマンスが重要なときは mergeMap
+
+```ts
+ngOnInit() {
+  this.form.valueChanges
+    .pipe(
+      filter(() => this.form.valid),
+      mergeMap((changes) => this.saveCourse(changes))
+    )
+    .subscribe();
+}
+
+ngOnInit() {
+  this.form.valueChanges
+    .pipe(
+      filter(() => this.form.valid),
+      mergeMap((changes) => this.saveCourse(changes))
+    )
+    .subscribe();
+}
+```
+
+# ExhaustMap Operator
+
+exhaust = 使い切る、出し切る、絞り切る、排気する
+
+`concatMap`や`mergeMap`と同じく、 stream に関数を map して
+Promise 値を返すコールバックから作る　Operator
+
+入力されたPromsie を解決して Stream に流すまで、
+他の入力値は無視される
+
+```sh
+# exaustMap
+---
+ x
+  x
+   ---
+    x
+     x
+      ---
+       x
+        x
+```
+3秒かかるPromise
+1秒後と2秒後の入力値は無視
+3秒後に解決されるので、新しい入力値を受け取る。
+
+例えば、`SAVE`ボタンを連打すると、
+concatMap や mergeMap だと連続でPromiseが作成されるが、
+`exahstMap` + `unsubscribe`とかすれば 1回だけの入力にできたりする。
+
+
+# Unsubscription
+
+HTTPをキャンセルする。
+
+検索ワード変更機能の実装などに便利
+検索を実行中に、ユーザーが別の検索ワードを入力して
+再度検索を実行したら、実行中のHTTPリクエストをキャンセルして別のリクエスト
+
+## fetch をキャンセルする。
+
+- `AbortController`: lib.dom.d.ts に入っている。fetch や DOM操作をキャンセルするコントローラー
+- `abortcontroller.signal` : シグナル
+
+`fetch` はキャンセルに対応する。
+第２引数の config object に `{signal: abortcontroller.signal}`を渡す
+
+
+## Observable コンストラクタのコールバックの戻り値
+
+```ts
+export const createHttpObservable = (url: string) =>
+  new Observable((observer) => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    fetch(url, { signal })
+      .then((response) => response.json())
+      .then((body) => {
+        observer.next(body);
+        observer.complete();
+      })
+      .catch((err) => observer.error(err));
+
+    return () => controller.abort();
+  });
+```
+
+new Observable で自前の Observable を作る場合は、
+関数を返す事ができる。
+
+コレが `subscription.unsbscribe()`メソッドの中身になる
+
+
+```ts
+const http$ = createHttpObservable("/api/courses");
+const sub = http$.subscribe(console.log);
+setTimeout(() => sub.unsubscribe(), 0);
+```
+
+subscribe してから 0秒で unsubscribe
+何も表示されない
+
+# type ahead search の実装
+type ahead search = incremental search
+
+いろんな呼び方がある
+- autocomplete
+- search as you type
+- filter/find as you type (FAYT)
+- incremental search
+- typeahead search
+- inline search
+- instant search
+- word wheeling
+
+
+## keyup event と HTTP リクエストを直接結びつける問題点
+
+すなわち、検索回数が圧倒的に多くなってしまうこと
+H
+He
+Hel
+Hell
+Hello
+Hello,
+Hello,W
+...
+
+一文字入力するごとに検索するとAPIに負荷が高い
+ユーザーの入力が安定してから自動検索する、`debounceTime` を設けることにする
+
+# debounseTime Operator
+
+https://rxjs.dev/api/operators/debounceTime
+
+いわゆる rate limit operator
+入力が止まったあとに、設定したdelay time経過したあと
+最後の値が出力される。
+
+delay time 中に新しい入力があった場合、delay をリセットして
+古い値は消える。
+
+単位がミリ秒なので注意
+
+# distinctUntil Operator
+
+この Operator を挟むと、
+Stream で連続した値が 2回連続できた場合、重複したものを取り除いて1つにする。
+incremental 検索でも、同じワードを2連続で検索する必要はないので
+挟んでおく
